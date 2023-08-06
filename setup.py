@@ -22,7 +22,7 @@ setup(
     ],
     install_requires=["numpy >= 1.21.5", "matplotlib >= 3.5.2", "tkinter >= 8.6"],
     extras_require={
-        "dev": [""],
+        "dev": ["pytest>=7.0", "twine>=4.0.2"],
     },
-    python_requires=">=3.9.13",
+    python_requires=">=3.9",
 )
