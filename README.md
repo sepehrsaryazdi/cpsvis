@@ -11,23 +11,18 @@ This application is available on [PyPI](https://pypi.org/). To run, it requires 
 ```
 sudo apt-get install python3 python3-tk
 python3 -m pip install cpsvis
-
 ```
 ## Mac (tkinter should already be distributed)
 
 ```
-
 pip3 install tk
 pip3 install cpsvis
-
 ```
 
 ## Windows (tkinter should already be distributed)
 
 ```
-
 pip3 install cpsvis
-
 ```
 
 
