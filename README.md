@@ -6,20 +6,20 @@ This GitHub project is dedicated to producing accurate and robust implementation
 
 This application is available on [PyPI](https://pypi.org/). To run, it requires a working installation of [tkinter](https://docs.python.org/3/library/tkinter.html). For installation, execute the following commands based on the distribution used.
 
-## Ubuntu Installation
+### Ubuntu Installation
 
 ```
 sudo apt-get install python3 python3-tk
 python3 -m pip install cpsvis
 ```
-## Mac (tkinter should already be distributed)
+### Mac (tkinter should already be distributed)
 
 ```
 pip3 install tk
 pip3 install cpsvis
 ```
 
-## Windows (tkinter should already be distributed)
+### Windows (tkinter should already be distributed)
 
 ```
 pip3 install cpsvis
