@@ -1,3 +1,3 @@
-from cpsvis.main import test
+from cpsvis.core.core_test import core_function
 
-print(test(1))
+print(core_function(1))
