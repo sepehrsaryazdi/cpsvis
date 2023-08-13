@@ -14,10 +14,22 @@ from cpsvis.core.topology import TopologicalEdge, TopologicalVertex, Topological
 
 triangle = TopologicalTriangle()
 
-triangle.initialise_edge()
-triangle.initialise_edge()
-triangle.initialise_edge()
 
-print(triangle.edges)
-edge = triangle.edges[0]
-assert isinstance(edge, TopologicalEdge)
+v0 = TopologicalVertex()
+v1 = TopologicalVertex()
+v2 = TopologicalVertex()
+
+e1 = TopologicalEdge(v0,v1)
+e2 = TopologicalEdge(v1, v2)
+e3 = TopologicalEdge(v2, v0)
+
+triangle.add_disjoint_edge(e1)
+triangle.add_vertex_connected_edge(e1, e2, v1)
+triangle.add_vertex_connected_edge(e2, e3, v2)
+e3.add_neighbouring_edge(e1, v0)
+
+triangle.check_closed()
+
+# print(triangle.edges[0].neighbouring_edges)
+# edge = triangle.edges[0]
+# assert isinstance(edge, TopologicalEdge)

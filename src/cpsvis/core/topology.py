@@ -100,6 +100,15 @@ class TopologicalEdge:
         self.neighbouring_edges = {v0: [], v1: []} # Hash map for all neighbouring edges connected at v0 or v1
         self.edge_glued = EdgeGluing(self)
     
+    def get_other_vertex(self, vertex):
+        assert isinstance(vertex, TopologicalVertex), f"Vertex {vertex} is not a valid TopologicalVertex."
+        assert vertex in self.vertices, f"Vertex {vertex} is not a child vertex of edge {self}."
+        if vertex == self.v0:
+            return self.v1
+        else:
+            return self.v0
+
+    
     def add_neighbouring_edge(self, neighbour_edge, common_vertex):
         """
         Adds a neighbouring edge to this edge at a common vertex.
@@ -109,10 +118,9 @@ class TopologicalEdge:
         assert neighbour_edge in common_vertex.parent_edges, f"Vertex {common_vertex} is not a child vertex of edge {neighbour_edge}."
         assert self in common_vertex.parent_edges, f"Vertex {common_vertex} is not a child vertex of edge {neighbour_edge}."
         
-        if neighbour_edge not in self.neighbouring_edges:
+        if neighbour_edge not in self.neighbouring_edges[self.v0] and neighbour_edge not in self.neighbouring_edges[self.v1]:
             self.neighbouring_edges[common_vertex].append(neighbour_edge)
-        
-        neighbour_edge.add_neighbouring_edge(self, common_vertex)
+            neighbour_edge.add_neighbouring_edge(self, common_vertex)
 
     def change_v0(self, new_v0):
         self.v0 = new_v0
@@ -135,21 +143,73 @@ class TopologicalPolygon:
     def __init__(self):
         self.vertices = []
         self.edges = []
+
+        self.edge_indexing = {} # Takes keys as edges and returns their corresponding index string.
     
+
+
+    def check_closed(self):
+        """
+        Traverses the polygon by starting at some random vertex (the first edge's first vertex) until it has made #edges steps. 
+        If it did not return to the first vertex, the polygon cannot be closed.
+
+        If it is closed, it turns a tuple (True, traversed_edges, traversed_vertices) which is a list of all the traversed edges and vertices respectively.
+        """
+        assert len(self.edges) > 0, f"Cannot check if polygon is closed as it does not have at least 1 edge."
+        starting_edge = self.edges[0]
+        assert isinstance(starting_edge, TopologicalEdge), f"Edge {starting_edge} is not a valid TopologicalEdge."
+        starting_vertex = starting_edge.v0
+        assert isinstance(starting_vertex, TopologicalVertex), f"Vertex {starting_vertex} is not a valid TopologicalVertex."
+
+
+        traversed_edges = []
+        traversed_vertices = []
+
+        current_vertex = starting_vertex
+        current_edge = starting_edge
+        index = 0
+        while index <= len(self.edges):
+            traversed_edges.append(current_edge)
+            traversed_vertices.append(current_vertex)
+
+
+            current_vertex = current_edge.get_other_vertex(current_vertex) # Get next vertex.
+            connected_edges = current_edge.neighbouring_edges[current_vertex]
+
+            if len(connected_edges) == 0:
+                # Cannot be a closed polygon if every edge is not connected from both ends.
+                return False
+            first_connected_edge = connected_edges[0] # Get the first edge that current_edge is connected to.
+            assert isinstance(first_connected_edge, TopologicalEdge), f"Edge {first_connected_edge} is not a valid TopologicalEdge."
+            current_edge = first_connected_edge
+            index+=1 # Keep count of how many edges have been traversed.
+
+            if current_vertex == starting_vertex:
+                # If we reached the same spot at the start, this means a cycle was traversed and we can stop traversal.
+                break
+        
+        return (True, traversed_edges, traversed_vertices)
+
+
+
     def auto_index_children(self):
         """
         Automatically adds indices for the children at the Polygon level, because every polygon gives relative indices to their own edges and vertices.
+        The edges are assumed to be ordered such that the edges are oriented as 01, 12, 23, 34, ..., (n-1)0 where n is the number of vertices.
+        
+        This function also assumes that the polygon is a valid polygon, which means following along the vertices of each edge should lead to a cycle.
         """
-        for edge in self.edges:
-            assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
-    
+        # for edge in self.edges:
+        #     assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
+        #     self.edge_indexing[]
+
     def add_disjoint_edge(self, edge):
         assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
         assert edge not in self.edges, f"Edge {edge} is already an edge of polygon {self}."
         self.edges.append(edge)
         edge.add_parent_polygon(self)
     
-    def add_vertex_connected_edge(self, new_edge, connecting_edge, common_vertex):
+    def add_vertex_connected_edge(self, connecting_edge, new_edge, common_vertex):
         assert isinstance(new_edge, TopologicalEdge), f"Edge {new_edge} is not a valid TopologicalEdge."
         assert isinstance(connecting_edge, TopologicalEdge), f"Edge {connecting_edge} is not a valid TopologicalEdge."
         assert isinstance(common_vertex, TopologicalVertex), f"Vertex {common_vertex} is not a valid TopologicalVertex."
@@ -158,36 +218,14 @@ class TopologicalPolygon:
         assert new_edge not in self.edges, f"Edge {new_edge} is already an edge in polygon {self}."
 
         new_edge.add_neighbouring_edge(connecting_edge, common_vertex)
-        self.edges.append(connecting_edge)
-        connecting_edge.add_parent_polygon(self)
-
-    # def add_edge_intersecting_vertex(self, edge_on_self, new_edge, intersecting_vertex):
-    #     assert isinstance(edge_on_self, TopologicalEdge), f"Edge {edge_on_self} is not a valid TopologicalEdge."
-    #     assert isinstance(new_edge, TopologicalEdge), f"Edge {new_edge} is not a valid TopologicalEdge."
-    #     assert isinstance(intersecting_vertex, TopologicalVertex), f"Vertex {intersecting_vertex} is not a valid TopologicalVertex."
-        
-    #     assert self in edge_on_self.parent_polyons, f"Edge on parentself does not have a parent polygon as self."
-    #     assert (intersecting_vertex in edge_on_self.vertices) and (intersecting_vertex in new_edge.vertices), f"Interescting vertex is not a valid intersection of the edges."
-
+        self.edges.append(new_edge)
+        new_edge.add_parent_polygon(self)
     
     def add_children_polygon_self(self):
         for edge in self.edges:
             assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
             edge.add_parent_polygon(self)
     
-    # def set_edge_children_uid(self, uid_list):
-    #     assert len(uid_list) == len(self.edges)
-    #     for edge, i in enumerate(self.edges):
-    #         assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
-    #         uid = uid_list[i]
-    #         edge.set_uid(uid)
-    
-    # def set_vertex_children_uid(self, uid_list):
-    #     assert len(uid_list) == len(self.vertices)
-    #     for vertex, i in enumerate(self.vertices):
-    #         assert isinstance(vertex, TopologicalEdge), f"Vertex {vertex} is not a valid TopologicalVertex."
-    #         uid = uid_list[i]
-    #         vertex.set_uid(uid)
     
     def initialise_edge(self):
         v0 = TopologicalVertex()
@@ -207,22 +245,12 @@ class TopologicalTriangle(TopologicalPolygon):
         assert len(self.edges) <= 2, f"Triangle {self} cannot have more than 3 edges."
         return super().add_disjoint_edge(edge)
     
-    def add_vertex_connected_edge(self, new_edge, connecting_edge, common_vertex):
+    def add_vertex_connected_edge(self, connecting_edge, new_edge, common_vertex):
         assert len(self.edges) <= 2, f"Triangle {self} cannot have more than 3 edges."
-        return super().add_vertex_connected_edge(new_edge, connecting_edge, common_vertex)
+        return super().add_vertex_connected_edge(connecting_edge, new_edge, common_vertex)
 
     
 
 class TopologicalMultiPolygon:
     def __init__(self):
         self.polygons = []
-    
-    # def set_polygon_children_uid(self, uid_list):
-    #     assert len(uid_list) == len(self.polygons)
-    #     for polygon, i in enumerate(self.polygons):
-    #         assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
-    #         uid = uid_list[i]
-    #         polygon.set_uid(uid)
-            
-    
-    
