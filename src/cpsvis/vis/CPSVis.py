@@ -4,7 +4,9 @@ This module defines an instance of the CPSVis application that handles all UI vi
 
 """
 
+from pandastable import Table
 import tkinter as tk
+from tkinter import ttk
 from ttkthemes import ThemedTk
 
 from cpsvis.vis.GUI import GUIWindow, Menu, MenuBar
@@ -22,6 +24,13 @@ class GluingTableInterface:
         assert isinstance(root, tk.Tk), f"Root {root} is not a valid tk.Tk object."
         self.root = root
         self.window = GUIWindow(root, "Construct Gluing Table")
+        self.table_frame = tk.Frame(self.window.tk_window)
+        self.table_frame.pack()
+        self.gluing_table = Table(self.table_frame, enable_menus=False)
+        self.gluing_table.show()
+
+        button = ttk.Button(self.window.tk_window, text="Test")
+        # button.place(relx=0.5, rely=0.5, anchor="center")
 
 class CPSVis:
     def __init__(self):
