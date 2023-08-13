@@ -224,22 +224,6 @@ class TopologicalPolygon:
             self.index_to_edge_hash[index_string] = edge
             self.edge_to_index_hash[edge] = index_string
 
-        
-        # for edge in traversed_edges:
-            
-        
-        # print(self.vertex_indexing)
-
-        # for edge in traversed_edges:
-        #     assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
-        #     traversed_edges.
-
-
-
-
-        # for edge in self.edges:
-        #     assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
-        #     self.edge_indexing[]
 
     def add_disjoint_edge(self, edge):
         assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
