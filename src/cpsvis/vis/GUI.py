@@ -33,12 +33,15 @@ class Menu:
         self.tk_menu.add_command(label=label, command=callback_fn)
 
 class GUIWindow:
-    def __init__(self, root, title):
+    def __init__(self, root, title, width=1280, height=520):
         assert isinstance(root, tk.Tk), f"Root {root} is not a valid tk.Tk object."
         assert isinstance(title, str), f"Title {title} is not a valid str."
+        assert isinstance(width, int), f"Width {width} is not a valid integer."
+        assert isinstance(height, int), f"Height {height} is not a valid integer."
         self.root = root
         self.window = tk.Toplevel()
         self.window.wm_title(title)
+        self.window.geometry(f"{width}x{height}")
         # l = tk.Label(self.window, text="Enter the desired genus g and number of punctures n for the surface Sg,n below.")
         # l.pack(padx=20, pady=10)
         # g_input_frame = tk.Frame(self.window)
