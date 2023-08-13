@@ -26,7 +26,7 @@ class CPSVis():
         self.filemenu = Menu(self.menubar, "File")
         self.menubar.add_menu(self.filemenu)
         self.menubar.attach_menu_bar()
-
+        self.filemenu.add_dropdown_option("Test", lambda : print("hello"))
         # self.win = GUIWindow(self.root, "Enter Gluing Table")
 
         # print(self.win)
