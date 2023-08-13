@@ -68,8 +68,6 @@ class EdgeGluing:
         return self.edge_glued_first_vertex
     def get_glued_second_vertex(self):
         return self.edge_glued_second_vertex
-        
-
 
 class TopologicalVertex:
     def __init__(self, uid=0):
@@ -103,8 +101,32 @@ class TopologicalEdge:
             v.add_parent_edge(self)
         self.uid = uid
         self.parent_polyons = []
+        self.neighbouring_edges = {v0: [], v1: []} # Hash map for all neighbouring edges connected at v0 or v1
         self.edge_glued = EdgeGluing(self)
     
+    def add_neighbouring_edge(self, neighbour_edge, common_vertex):
+        """
+        Adds a neighbouring edge to this edge at a common vertex.
+        """
+        assert isinstance(neighbour_edge, TopologicalEdge), f"Edge {neighbour_edge} is not a valid TopologicalEdge."
+        assert isinstance(common_vertex, TopologicalVertex), f"Vertex {common_vertex} is not a valid TopolgicalVertex."
+        assert neighbour_edge in common_vertex.parent_edges, f"Vertex {common_vertex} is not a child vertex of edge {neighbour_edge}."
+        assert self in common_vertex.parent_edges, f"Vertex {common_vertex} is not a child vertex of edge {neighbour_edge}."
+        
+        if neighbour_edge not in self.neighbouring_edges:
+            self.neighbouring_edges[common_vertex].append(neighbour_edge)
+        
+        neighbour_edge.add_neighbouring_edge(self, common_vertex)
+
+    def change_v0(self, new_v0):
+        self.v0 = new_v0
+        self.neighbouring_edges[new_v0] = self.neighbouring_edges.pop()
+    
+    def change_v1(self, new_v1):
+        self.v1 = new_v1
+        self.neighbouring_edges[new_v1] = self.neighbouring_edges.pop()
+
+
     def add_parent_polygon(self, polygon):
         assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
         self.parent_polyons.append(polygon)
@@ -125,11 +147,34 @@ class TopologicalPolygon:
         self.vertices = []
         self.edges = []
         self.uid = uid
+
+
+    
+    def auto_index_children(self):
+        """
+        Automatically adds indices for the children at the Polygon level, because every polygon gives relative indices to their own edges and vertices.
+        """
+        for edge in self.edges:
+            assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
     
     def add_disjoint_edge(self, edge):
         assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
+        assert edge not in self.edges, f"Edge {edge} is already an edge of polygon {self}."
         self.edges.append(edge)
+        edge.add_parent_polygon(self)
     
+    def add_vertex_connected_edge(self, new_edge, connecting_edge, common_vertex):
+        assert isinstance(new_edge, TopologicalEdge), f"Edge {new_edge} is not a valid TopologicalEdge."
+        assert isinstance(connecting_edge, TopologicalEdge), f"Edge {connecting_edge} is not a valid TopologicalEdge."
+        assert isinstance(common_vertex, TopologicalVertex), f"Vertex {common_vertex} is not a valid TopologicalVertex."
+
+        assert connecting_edge in self.edges, f"Edge {connecting_edge} is not a valid child edge of polygon {self}."
+        assert new_edge not in self.edges, f"Edge {new_edge} is already an edge in polygon {self}."
+
+        new_edge.add_neighbouring_edge(connecting_edge, common_vertex)
+        self.edges.append(connecting_edge)
+        connecting_edge.add_parent_polygon(self)
+
     # def add_edge_intersecting_vertex(self, edge_on_self, new_edge, intersecting_vertex):
     #     assert isinstance(edge_on_self, TopologicalEdge), f"Edge {edge_on_self} is not a valid TopologicalEdge."
     #     assert isinstance(new_edge, TopologicalEdge), f"Edge {new_edge} is not a valid TopologicalEdge."
@@ -167,8 +212,24 @@ class TopologicalPolygon:
         v1 = TopologicalVertex(1)
         edge = TopologicalEdge(v0,v1)
         edge.add_children_edge_self()
-        edge.add_parent_polygon(self)
         self.add_disjoint_edge(edge)
+
+class TopologicalTriangle(TopologicalPolygon):
+    """
+    Triangle class which is an inherited TopologicalPolygon with added functionality such as canonical indexing.
+    """
+    def __init__(self, uid=0):
+        super().__init__()
+    
+    def add_disjoint_edge(self, edge):
+        assert len(self.edges) <= 2, f"Triangle {self} cannot have more than 3 edges."
+        return super().add_disjoint_edge(edge)
+    
+    def add_vertex_connected_edge(self, new_edge, connecting_edge, common_vertex):
+        assert len(self.edges) <= 2, f"Triangle {self} cannot have more than 3 edges."
+        return super().add_vertex_connected_edge(new_edge, connecting_edge, common_vertex)
+
+    
 
 class TopologicalMultiPolygon:
     def __init__(self, uid=0):
