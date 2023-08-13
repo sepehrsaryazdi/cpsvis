@@ -7,7 +7,7 @@ This module defines an instance of the CPSVis application that handles all UI vi
 from pandastable import Table, TableModel
 import pandas as pd
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from ttkthemes import ThemedTk
 
 from cpsvis.vis.GUI import GUIWindow, Menu, MenuBar
@@ -31,13 +31,18 @@ class GluingTableInterface:
         self.initial_table = pd.DataFrame({"Edge (01)": [""], "Edge (12)": [""], "Edge (20)": [""]})
         # self.initial_table.set_index("Triangle")
 
+        def callback(*args):
+            messagebox.showinfo(title="Achtung", message="Achtung")
+
+        self.window.tk_window.bind('<Return>', callback)
+
         self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
         self.gluing_table.expandColumns(50)
         self.gluing_table.show()
 
         self.initial_table = pd.DataFrame({"Edge (01)": ["1"], "Edge (12)": [""], "Edge (20)": [""]})
 
-        self.gluing_table.model = TableModel(dataframe=self.initial_table)
+        # self.gluing_table.model = TableModel(dataframe=self.initial_table)
         # self.gluing_table.show()
 
 
