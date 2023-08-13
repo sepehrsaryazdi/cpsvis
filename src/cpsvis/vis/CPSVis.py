@@ -19,7 +19,9 @@ class GluingTableModel(TableModel):
         super().__init__(dataframe)
     
     def getValueAt(self, row, col):
-        print(row,col, 'test')
+        assert isinstance(self.df, pd.DataFrame), f"Dataframe {self.df} is not a valid Dataframe."
+        if row >= len(self.df.index):
+            self.df.loc[len(self.df)] = [""]*len(self.df.columns)
         return super().getValueAt(row, col)
     
 
@@ -40,7 +42,9 @@ class GluingTableInterface:
         self.table_frame = tk.Frame(self.window.tk_window)
         self.table_frame.pack()
 
-        self.initial_table = pd.DataFrame({"Edge (01)": [""], "Edge (12)": [""], "Edge (20)": [""]})
+        self.initial_dict = {"Edge (01)": [""], "Edge (12)": [""], "Edge (20)": [""]}
+
+        self.initial_table = pd.DataFrame(self.initial_dict)
         # self.initial_table.set_index("Triangle")
 
         def callback(*args):
