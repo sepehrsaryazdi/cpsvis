@@ -1,6 +1,6 @@
 import numpy as np
 
-class EdgeGluing:
+class TopologicalEdgeGluing:
     """
     Class which is instantiated within every TopologicalEdge to keep track of what edge this particular edge is glued to, if any.
     """
@@ -98,7 +98,7 @@ class TopologicalEdge:
             v.add_parent_edge(self)
         self.parent_polyons = []
         self.neighbouring_edges = {v0: [], v1: []} # Hash map for all neighbouring edges connected at v0 or v1
-        self.edge_glued = EdgeGluing(self)
+        self.edge_glued = TopologicalEdgeGluing(self)
     
     def get_other_vertex(self, vertex):
         assert isinstance(vertex, TopologicalVertex), f"Vertex {vertex} is not a valid TopologicalVertex."
