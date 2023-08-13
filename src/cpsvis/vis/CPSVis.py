@@ -21,7 +21,7 @@ class GluingTableModel(TableModel):
     def getValueAt(self, row, col):
         assert isinstance(self.df, pd.DataFrame), f"Dataframe {self.df} is not a valid Dataframe."
         if row >= len(self.df.index):
-            self.df.loc[len(self.df)] = [""]*len(self.df.columns)
+            self.autoAddRows(1)
         return super().getValueAt(row, col)
     
 
@@ -38,7 +38,7 @@ class GluingTableInterface:
     def __init__(self, root):
         assert isinstance(root, tk.Tk), f"Root {root} is not a valid tk.Tk object."
         self.root = root
-        self.window = GUIWindow(root, "Construct Gluing Table")
+        self.window = GUIWindow(root, "Construct Triangulation Gluing Table")
         self.table_frame = tk.Frame(self.window.tk_window)
         self.table_frame.pack()
 
