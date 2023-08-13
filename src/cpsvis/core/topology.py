@@ -7,8 +7,8 @@ class EdgeGluing:
     def __init__(self, self_edge):
         self.self_edge = self_edge
         self.edge_glued = None
-        self.edge_glued_v0 = None
-        self.edge_glued_v1 = None
+        self.edge_glued_first_vertex = None
+        self.edge_glued_second_vertex = None
     
     def glue_edge(self, edge_to_glue, first_vertex, second_vertex):
         """
@@ -44,6 +44,7 @@ class EdgeGluing:
         assert isinstance(first_vertex, TopologicalVertex), f"Vertex {first_vertex} is not a valid TopologicalVertex."
         assert isinstance(second_vertex, TopologicalVertex), f"Vertex {second_vertex} is not a valid TopologicalVertex."
 
+        assert first_vertex != second_vertex, f"Cannot glue {self.self_edge} to the same vertex of edge {edge_to_glue}."
         assert edge_to_glue in first_vertex.parent_edges, f"Vertex {first_vertex} is not a child vertex of edge {edge_to_glue}."
         assert edge_to_glue in second_vertex.parent_edges, f"Vertex {second_vertex} is not a child vertex of edge {edge_to_glue}."
 
@@ -51,12 +52,22 @@ class EdgeGluing:
         self.edge_glued_first_vertex = first_vertex
         self.edge_glued_second_vertex = second_vertex
 
-        flipped = (first_vertex!= edge_to_glue.v0) # If the orientation is flipped, this needs to be reflected in the other gluing
+        flipped = (first_vertex != edge_to_glue.v0) # If the orientation is flipped in the gluing, this needs to be reflected in the other gluing
         if not flipped:
-            edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v0, self.self_edge.v1)
+            if not (edge_to_glue.edge_glued.edge_glued == self.self_edge and edge_to_glue.edge_glued.edge_glued_first_vertex == self.self_edge.v0 and edge_to_glue.edge_glued.edge_glued_second_vertex == self.self_edge.v1):
+                # Only perform this operation if the gluing actually changes the current topological configuration.
+                edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v0, self.self_edge.v1)
         else:
-            edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v1, self.self_edge.v0)
-
+            if not (edge_to_glue.edge_glued.edge_glued == self.self_edge and edge_to_glue.edge_glued.edge_glued_first_vertex == self.self_edge.v1 and edge_to_glue.edge_glued.edge_glued_second_vertex == self.self_edge.v0):
+                # Only perform this operation if the gluing actually changes the current topological configuration.
+                edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v1, self.self_edge.v0)
+    
+    def get_edge(self):
+        return self.edge_glued
+    def get_glued_first_vertex(self):
+        return self.edge_glued_first_vertex
+    def get_glued_second_vertex(self):
+        return self.edge_glued_second_vertex
         
 
 
@@ -83,10 +94,13 @@ class TopologicalEdge:
     def __init__(self, v0, v1, uid=0):
         assert isinstance(v0, TopologicalVertex), f"Vertex {v0} is not a valid TopologicalVertex."
         assert isinstance(v1, TopologicalVertex), f"Vertex {v1} is not a valid TopologicalVertex."
+        
+        assert v0 != v1, "Can't assign the same vertex to the endpoints of edge."
         self.v0 = v0
         self.v1 = v1
-        assert v0 != v1, "Can't assign the same vertex to the endpoints of edge."
         self.vertices = [v0,v1]
+        for v in self.vertices:
+            v.add_parent_edge(self)
         self.uid = uid
         self.parent_polyons = []
         self.edge_glued = EdgeGluing(self)
