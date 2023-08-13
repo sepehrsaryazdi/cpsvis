@@ -144,9 +144,10 @@ class TopologicalPolygon:
         self.vertices = []
         self.edges = []
 
-        self.edge_indexing = {} # Takes keys as edges and returns their corresponding index string.
-    
-
+        self.index_to_edge_hash = {} # Takes keys as index string and returns the corresponding edge.
+        self.index_to_vertex_hash = {} # Takes keys as index string and returns the corresponding vertex.
+        self.edge_to_index_hash = {} # Takes keys as edge and returns the corresopnding index.
+        self.vertex_to_index_hash = {} # Takes keys as vertex and returns the corresponding index.
 
     def check_closed(self):
         """
@@ -197,10 +198,45 @@ class TopologicalPolygon:
     def auto_index_children(self):
         """
         Automatically adds indices for the children at the Polygon level, because every polygon gives relative indices to their own edges and vertices.
-        The edges are assumed to be ordered such that the edges are oriented as 01, 12, 23, 34, ..., (n-1)0 where n is the number of vertices.
+        The edges are assumed to be ordered such that the edges are oriented as 01, 12, 23, 34, ..., (n-1)0 where n is the number of vertices based on the traversed cycle.
         
         This function also assumes that the polygon is a valid polygon, which means following along the vertices of each edge should lead to a cycle.
+        
+        The vertices are indexed from the start to end in increasing order. The edges are indexed in the form "ij" where i is the index of v0 and j is the index of v1.
         """
+
+        closed, traversed_edges, traversed_vertices = self.check_closed()
+        assert closed, f"Cannot auto index open polygon {self}."
+
+        index = 0
+        for vertex in traversed_vertices:
+            assert isinstance(vertex, TopologicalVertex), f"Vertex {vertex} is not a valid TopologicalVertex."
+            self.index_to_vertex_hash[str(index)] = vertex 
+            self.vertex_to_index_hash[vertex] = str(index)
+            index+=1
+        
+        for edge in traversed_edges:
+            v0 = edge.v0
+            v1 = edge.v1
+            assert v0 in self.vertex_to_index_hash.keys(), f"Vertex {v0} is not a valid indexed vertex on polygon {self}."
+            assert v1 in self.vertex_to_index_hash.keys(), f"Vertex {v1} is not a valid indexed vertex on polygon {self}."
+            index_string = f"{self.vertex_to_index_hash[v0]}{self.vertex_to_index_hash[v1]}"
+            self.index_to_edge_hash[index_string] = edge
+            self.edge_to_index_hash[edge] = index_string
+
+        
+        # for edge in traversed_edges:
+            
+        
+        # print(self.vertex_indexing)
+
+        # for edge in traversed_edges:
+        #     assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
+        #     traversed_edges.
+
+
+
+
         # for edge in self.edges:
         #     assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
         #     self.edge_indexing[]

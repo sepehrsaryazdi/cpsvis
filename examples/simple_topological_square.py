@@ -20,5 +20,9 @@ polygon.add_vertex_connected_edge(e2, e3, v2)
 polygon.add_vertex_connected_edge(e3, e4, v3)
 e4.add_neighbouring_edge(e1, v0)
 
-print(polygon.check_closed())
+polygon.auto_index_children()
+
+print(polygon.index_to_vertex_hash)
+
+# print(polygon.check_closed())
 
