@@ -1,5 +1,64 @@
 import numpy as np
 
+class EdgeGluing:
+    """
+    Class which is instantiated within every TopologicalEdge to keep track of what edge this particular edge is glued to, if any.
+    """
+    def __init__(self, self_edge):
+        self.self_edge = self_edge
+        self.edge_glued = None
+        self.edge_glued_v0 = None
+        self.edge_glued_v1 = None
+    
+    def glue_edge(self, edge_to_glue, first_vertex, second_vertex):
+        """
+        Glues this edge to edge_to_glue with orientation defined as this edge's first vertex being glued to the first_vertex of the edge_to_glue, and the second vertex being glued to second_vertex.
+        This function will also update the other edge's knowledge of which edge it is glued to, that is, it will be glued to this edge.
+        Example 1:
+        v11 = TopologicalVertex()
+        v12 = TopologicalVertex()
+        edge1 = TopologicalEdge(v11, v12)
+
+        v21 = TopologicalVertex()
+        v22 = TopologicalVertex()
+        edge2 = TopologicalEdge(v21, v22)
+
+        edge1.edge_glued.glue_edge(edge2, v21, v22)
+
+        This corresponds to edge1 and edge2 being identified with the same orientation.
+
+        Example 2:
+        v11 = TopologicalVertex()
+        v12 = TopologicalVertex()
+        edge1 = TopologicalEdge(v11, v12)
+
+        v21 = TopologicalVertex()
+        v22 = TopologicalVertex()
+        edge2 = TopologicalEdge(v21, v22)
+
+        edge1.edge_glued.glue_edge(edge2, v22, v21)
+
+        This corresponds to edge1 and edge2 being identified with opposite orientations.
+        """
+        assert isinstance(edge_to_glue, TopologicalEdge), f"Edge {edge_to_glue} is not a valid TopologicalEdge."
+        assert isinstance(first_vertex, TopologicalVertex), f"Vertex {first_vertex} is not a valid TopologicalVertex."
+        assert isinstance(second_vertex, TopologicalVertex), f"Vertex {second_vertex} is not a valid TopologicalVertex."
+
+        assert edge_to_glue in first_vertex.parent_edges, f"Vertex {first_vertex} is not a child vertex of edge {edge_to_glue}."
+        assert edge_to_glue in second_vertex.parent_edges, f"Vertex {second_vertex} is not a child vertex of edge {edge_to_glue}."
+
+        self.edge_glued = edge_to_glue
+        self.edge_glued_first_vertex = first_vertex
+        self.edge_glued_second_vertex = second_vertex
+
+        flipped = (first_vertex!= edge_to_glue.v0) # If the orientation is flipped, this needs to be reflected in the other gluing
+        if not flipped:
+            edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v0, self.self_edge.v1)
+        else:
+            edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v1, self.self_edge.v0)
+
+        
+
 
 class TopologicalVertex:
     def __init__(self, uid=0):
@@ -17,6 +76,10 @@ class TopologicalVertex:
 
 
 class TopologicalEdge:
+    """
+    TopologicalEdge object which defines the 1-dim skeleton of a topological space.
+    The edge is given a natural orientation in the order v0 -> v1, where v0, v1 are its adjacent (viewed as children) vertices.
+    """
     def __init__(self, v0, v1, uid=0):
         assert isinstance(v0, TopologicalVertex), f"Vertex {v0} is not a valid TopologicalVertex."
         assert isinstance(v1, TopologicalVertex), f"Vertex {v1} is not a valid TopologicalVertex."
@@ -26,6 +89,7 @@ class TopologicalEdge:
         self.vertices = [v0,v1]
         self.uid = uid
         self.parent_polyons = []
+        self.edge_glued = EdgeGluing(self)
     
     def add_parent_polygon(self, polygon):
         assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
