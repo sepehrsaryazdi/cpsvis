@@ -161,6 +161,7 @@ class TopologicalPolygon:
         starting_vertex = starting_edge.v0
         assert isinstance(starting_vertex, TopologicalVertex), f"Vertex {starting_vertex} is not a valid TopologicalVertex."
 
+        traversed_cycle = False
 
         traversed_edges = []
         traversed_vertices = []
@@ -178,17 +179,18 @@ class TopologicalPolygon:
 
             if len(connected_edges) == 0:
                 # Cannot be a closed polygon if every edge is not connected from both ends.
-                return False
+                return (False, traversed_edges, traversed_vertices)
             first_connected_edge = connected_edges[0] # Get the first edge that current_edge is connected to.
             assert isinstance(first_connected_edge, TopologicalEdge), f"Edge {first_connected_edge} is not a valid TopologicalEdge."
             current_edge = first_connected_edge
             index+=1 # Keep count of how many edges have been traversed.
 
             if current_vertex == starting_vertex:
+                traversed_cycle = True
                 # If we reached the same spot at the start, this means a cycle was traversed and we can stop traversal.
                 break
         
-        return (True, traversed_edges, traversed_vertices)
+        return (traversed_cycle, traversed_edges, traversed_vertices)
 
 
 
