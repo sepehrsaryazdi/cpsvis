@@ -4,7 +4,8 @@ This module defines an instance of the CPSVis application that handles all UI vi
 
 """
 
-from pandastable import Table
+from pandastable import Table, TableModel
+import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from ttkthemes import ThemedTk
@@ -26,8 +27,22 @@ class GluingTableInterface:
         self.window = GUIWindow(root, "Construct Gluing Table")
         self.table_frame = tk.Frame(self.window.tk_window)
         self.table_frame.pack()
-        self.gluing_table = Table(self.table_frame, enable_menus=False)
+
+        self.initial_table = pd.DataFrame({"Edge (01)": [""], "Edge (12)": [""], "Edge (20)": [""]})
+        # self.initial_table.set_index("Triangle")
+
+        self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
+        self.gluing_table.expandColumns(50)
         self.gluing_table.show()
+
+        self.initial_table = pd.DataFrame({"Edge (01)": ["1"], "Edge (12)": [""], "Edge (20)": [""]})
+
+        self.gluing_table.model = TableModel(dataframe=self.initial_table)
+        # self.gluing_table.show()
+
+
+
+        
 
         button = ttk.Button(self.window.tk_window, text="Test")
         # button.place(relx=0.5, rely=0.5, anchor="center")
