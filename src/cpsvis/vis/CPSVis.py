@@ -12,8 +12,16 @@ class TkApp(tk.Frame):
         super().__init__(master)
         self.pack(anchor='nw')
 
+class GluingTableInterface:
+    """
+    This class defines a graphical user interface for constructing a gluing table.
+    """
+    def __init__(self, root):
+        assert isinstance(root, tk.Tk), f"Root {root} is not a valid tk.Tk object."
+        self.root = root
+        self.window = GUIWindow(root, "Construct Gluing Table")
 
-class CPSVis():
+class CPSVis:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Convex Projective Structure Visualisation Tool')
@@ -26,10 +34,8 @@ class CPSVis():
         self.filemenu = Menu(self.menubar, "File")
         self.menubar.add_menu(self.filemenu)
         self.menubar.attach_menu_bar()
-        self.filemenu.add_dropdown_option("Test", lambda : print("hello"))
-        # self.win = GUIWindow(self.root, "Enter Gluing Table")
+        self.filemenu.add_dropdown_option("Construct Gluing Table", lambda : GluingTableInterface(self.root))
 
-        # print(self.win)
 
 
         self.tk_app.mainloop()
