@@ -100,7 +100,7 @@ class TopologicalEdge:
         self.neighbouring_edges = {v0: [], v1: []} # Hash map for all neighbouring edges connected at v0 or v1
         self.edge_glued = TopologicalEdgeGluing(self)
     
-    def get_other_vertex(self, vertex):
+    def get_other_vertex(self, vertex) -> None:
         assert isinstance(vertex, TopologicalVertex), f"Vertex {vertex} is not a valid TopologicalVertex."
         assert vertex in self.vertices, f"Vertex {vertex} is not a child vertex of edge {self}."
         if vertex == self.v0:
@@ -122,20 +122,20 @@ class TopologicalEdge:
             self.neighbouring_edges[common_vertex].append(neighbour_edge)
             neighbour_edge.add_neighbouring_edge(self, common_vertex)
 
-    def change_v0(self, new_v0):
+    def change_v0(self, new_v0) -> None:
         self.v0 = new_v0
         self.neighbouring_edges[new_v0] = self.neighbouring_edges.pop()
     
-    def change_v1(self, new_v1):
+    def change_v1(self, new_v1) -> None:
         self.v1 = new_v1
         self.neighbouring_edges[new_v1] = self.neighbouring_edges.pop()
 
 
-    def add_parent_polygon(self, polygon):
+    def add_parent_polygon(self, polygon) -> None:
         assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
         self.parent_polyons.append(polygon)
     
-    def add_children_edge_self(self):
+    def add_children_edge_self(self) -> None:
         self.v0.add_parent_edge(self)
         self.v1.add_parent_edge(self)
 
@@ -149,7 +149,7 @@ class TopologicalPolygon:
         self.edge_to_index_hash = {} # Takes keys as edge and returns the corresopnding index.
         self.vertex_to_index_hash = {} # Takes keys as vertex and returns the corresponding index.
 
-    def check_closed(self):
+    def check_closed(self) -> tuple[bool, list, list]:
         """
         Traverses the polygon by starting at some random vertex (the first edge's first vertex) until it has made #edges steps. 
         If it did not return to the first vertex, the polygon cannot be closed.
@@ -243,7 +243,7 @@ class TopologicalPolygon:
         self.edges.append(new_edge)
         new_edge.add_parent_polygon(self)
     
-    def add_children_polygon_self(self):
+    def add_children_polygon_self(self) -> None:
         for edge in self.edges:
             assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
             edge.add_parent_polygon(self)
@@ -277,7 +277,7 @@ class TopologicalMultiPolygon:
     def __init__(self):
         self.polygons = []
     
-    def add_disjoint_polygon(self, polygon):
+    def add_disjoint_polygon(self, polygon) -> None:
         assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
         self.polygons.append(polygon)
 
@@ -286,7 +286,7 @@ class TopologicalMultiTriangle(TopologicalMultiPolygon):
         super().__init__()
         self.polygons = []
     
-    def add_disjoint_polygon(self, triangle):
+    def add_disjoint_polygon(self, triangle) -> None:
         assert isinstance(triangle, TopologicalTriangle), f"Triangle {triangle} is not a valid TopologicalTriangle."
         return super().add_disjoint_polygon(triangle)
     
