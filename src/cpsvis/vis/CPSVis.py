@@ -5,6 +5,8 @@ This module defines an instance of the CPSVis application that handles all UI vi
 """
 
 import tkinter as tk
+from ttkthemes import ThemedTk
+
 from cpsvis.vis.GUI import GUIWindow, Menu, MenuBar
 
 class TkApp(tk.Frame):
@@ -23,7 +25,7 @@ class GluingTableInterface:
 
 class CPSVis:
     def __init__(self):
-        self.root = tk.Tk()
+        self.root = ThemedTk(theme="arc")
         self.root.title('Convex Projective Structure Visualisation Tool')
         self.root.geometry("1280x520")
         self.menubar = tk.Menu(self.root)
@@ -31,7 +33,7 @@ class CPSVis:
         self.tk_app = TkApp(self.root)
         
         self.menubar = MenuBar(self.root)
-        self.filemenu = Menu(self.menubar, "File")
+        self.filemenu = Menu(self.menubar, "Generate")
         self.menubar.add_menu(self.filemenu)
         self.menubar.attach_menu_bar()
         self.filemenu.add_dropdown_option("Construct Gluing Table", lambda : GluingTableInterface(self.root))
