@@ -39,22 +39,39 @@ class GluingTableInterface:
         assert isinstance(root, tk.Tk), f"Root {root} is not a valid tk.Tk object."
         self.root = root
         self.window = GUIWindow(root, "Construct Triangulation Gluing Table")
+
+
+        self.buttons_frame = ttk.Frame(self.window.tk_window)
+        self.buttons_frame.pack(side="top", fill='x')
+
+        self.add_triangle_button = ttk.Button(self.buttons_frame, text="Add Triangle")
+        self.add_triangle_button.pack(side="left", padx=(5,2.5), pady=(0,0))
+
+        self.delete_triangle_button = ttk.Button(self.buttons_frame, text="Delete Triangle")
+        self.delete_triangle_button.pack(side="left", padx=(2.5,2.5), pady=(0,0))
+
         self.table_frame = tk.Frame(self.window.tk_window)
-        self.table_frame.pack()
+        self.table_frame.pack(fill='x')
 
         self.initial_dict = {"Edge (01)": [""], "Edge (12)": [""], "Edge (20)": [""]}
 
         self.initial_table = pd.DataFrame(self.initial_dict)
         # self.initial_table.set_index("Triangle")
 
+
+
+        self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
+        self.gluing_table.model = GluingTableModel(dataframe=self.initial_table)
+
+
+
+
         def callback(*args):
+            # print(self.gluing_table.multiplerowlist)
             pass
             # messagebox.showinfo(title="Achtung", message="Achtung")
 
         self.window.tk_window.bind('<Return>', callback)
-
-        self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
-        self.gluing_table.model = GluingTableModel(dataframe=self.initial_table)
 
         self.gluing_table.expandColumns(50)
         self.gluing_table.show()
@@ -67,8 +84,6 @@ class GluingTableInterface:
 
         
 
-        button = ttk.Button(self.window.tk_window, text="Test")
-        # button.place(relx=0.5, rely=0.5, anchor="center")
 
 class CPSVis:
     def __init__(self):
