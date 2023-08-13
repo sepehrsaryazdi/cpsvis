@@ -21,8 +21,15 @@ class GluingTableModel(TableModel):
     def getValueAt(self, row, col):
         assert isinstance(self.df, pd.DataFrame), f"Dataframe {self.df} is not a valid Dataframe."
         if row >= len(self.df.index):
-            self.autoAddRows(1)
+            self.addRow()
         return super().getValueAt(row, col)
+    
+    def addRow(self):
+        self.df.index = pd.Index([i for i in range(len(self.df))])
+        self.df.loc[len(self.df.index)] = [""]*len(self.df.columns)
+
+    def deleteRow(self, row, unique=True):
+        return super().deleteRow(row, unique)
     
 
 
@@ -47,7 +54,7 @@ class GluingTableInterface:
         self.add_triangle_button = ttk.Button(self.buttons_frame, text="Add Triangle")
         self.add_triangle_button.pack(side="left", padx=(5,2.5), pady=(0,0))
 
-        self.delete_triangle_button = ttk.Button(self.buttons_frame, text="Delete Triangle")
+        self.delete_triangle_button = ttk.Button(self.buttons_frame, text="Delete Selected Triangle")
         self.delete_triangle_button.pack(side="left", padx=(2.5,2.5), pady=(0,0))
 
         self.table_frame = tk.Frame(self.window.tk_window)
@@ -62,8 +69,10 @@ class GluingTableInterface:
 
         self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
         self.gluing_table.model = GluingTableModel(dataframe=self.initial_table)
-
-
+        self.gluing_table.multiplerowlist = [0]
+        self.gluing_table.redraw()
+        self.add_triangle_button.bind("<ButtonPress>", lambda event : [self.gluing_table.model.addRow(), self.gluing_table.redraw()])
+        self.delete_triangle_button.bind("<ButtonPress>", lambda event : [self.gluing_table.model.deleteRow(index) for index in self.gluing_table.multiplerowlist] + [self.gluing_table.redraw()])
 
 
         def callback(*args):
