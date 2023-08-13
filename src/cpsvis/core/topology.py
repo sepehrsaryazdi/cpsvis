@@ -276,3 +276,17 @@ class TopologicalTriangle(TopologicalPolygon):
 class TopologicalMultiPolygon:
     def __init__(self):
         self.polygons = []
+    
+    def add_disjoint_polygon(self, polygon):
+        assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
+        self.polygons.append(polygon)
+
+class TopologicalMultiTriangle(TopologicalMultiPolygon):
+    def __init__(self):
+        super().__init__()
+        self.polygons = []
+    
+    def add_disjoint_polygon(self, triangle):
+        assert isinstance(triangle, TopologicalTriangle), f"Triangle {triangle} is not a valid TopologicalTriangle."
+        return super().add_disjoint_polygon(triangle)
+    
