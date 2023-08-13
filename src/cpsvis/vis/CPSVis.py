@@ -5,7 +5,7 @@ This module defines an instance of the CPSVis application that handles all UI vi
 """
 
 import tkinter as tk
-from cpsvis.vis.GUI import GUIWindow
+from cpsvis.vis.GUI import GUIWindow, Menu, MenuBar
 
 class TkApp(tk.Frame):
     def __init__(self, master):
@@ -22,10 +22,14 @@ class CPSVis():
         self.root.configure(menu=self.menubar)
         self.tk_app = TkApp(self.root)
         
+        self.menubar = MenuBar(self.root)
+        self.filemenu = Menu(self.menubar, "File")
+        self.menubar.add_menu(self.filemenu)
+        self.menubar.attach_menu_bar()
 
-        self.win = GUIWindow(self.root, "Enter Gluing Table")
+        # self.win = GUIWindow(self.root, "Enter Gluing Table")
 
-        print(self.win)
+        # print(self.win)
 
 
         self.tk_app.mainloop()
