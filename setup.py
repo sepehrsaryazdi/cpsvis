@@ -9,6 +9,7 @@ setup(
     description="Convex Projective Surface Visualisation Tool",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
+    package_data={'': ['src/cpsvis/image/*']},
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/sepehrsaryazdi/cpsvis",

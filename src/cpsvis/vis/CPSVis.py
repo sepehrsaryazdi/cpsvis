@@ -3,13 +3,15 @@
 This module defines an instance of the CPSVis application that handles all UI visualisation components.
 
 """
-
+import pkg_resources
 from pandastable import Table, TableModel
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkthemes import ThemedTk
+import os
 
+import cpsvis
 from cpsvis.vis.GUI import GUIWindow, Menu, MenuBar
 
 
@@ -46,7 +48,7 @@ class GluingTableInterface:
         assert isinstance(root, tk.Tk), f"Root {root} is not a valid tk.Tk object."
         self.root = root
         self.window = GUIWindow(root, "Construct Triangulation Gluing Table")
-
+        
 
         self.buttons_frame = ttk.Frame(self.window.tk_window)
         self.buttons_frame.pack(side="top", fill='x')
@@ -96,9 +98,13 @@ class GluingTableInterface:
 
 class CPSVis:
     def __init__(self):
-        self.root = ThemedTk(theme="arc")
+        self.root = ThemedTk(theme="arc", className='Convex Projective Structure Visualisation Tool')
         self.root.title('Convex Projective Structure Visualisation Tool')
         self.root.geometry("1280x520")
+
+        images_path = pkg_resources.resource_filename('cpsvis', 'image/hyperbolic_plane.png')
+        self.root.iconphoto(False, tk.PhotoImage(file=images_path))
+
         self.menubar = tk.Menu(self.root)
         self.root.configure(menu=self.menubar)
         self.tk_app = TkApp(self.root)
