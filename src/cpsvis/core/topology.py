@@ -276,6 +276,8 @@ class TopologicalTriangle(TopologicalPolygon):
 class TopologicalMultiPolygon:
     def __init__(self):
         self.polygons = []
+        self.index_to_polygon_hash = {}
+        self.polygon_to_index_hash = {}
     
     def add_disjoint_polygon(self, polygon) -> None:
         assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."

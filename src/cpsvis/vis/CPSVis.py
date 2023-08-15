@@ -9,6 +9,8 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkthemes import ThemedTk
+from cpsvis.core.topology import TopologicalMultiTriangle, TopologicalPolygon
+from cpsvis.transform.gluing_table import GluingTableConversion
 import os
 
 import cpsvis
@@ -16,9 +18,12 @@ from cpsvis.vis.GUI import GUIWindow, Menu, MenuBar
 
 
 class GluingTableModel(TableModel):
-    def __init__(self, dataframe=None):
+    def __init__(self, triangulation, dataframe=None):
         assert isinstance(dataframe, pd.DataFrame), f"Dataframe {dataframe} is not a valid pandas Dataframe."
         super().__init__(dataframe)
+
+        assert isinstance(triangulation, TopologicalMultiTriangle), f"Triangulation {triangulation} is not a valid TopologicalMultiTriangle."
+        self.triangulation = triangulation
     
     def getValueAt(self, row, col):
         assert isinstance(self.df, pd.DataFrame), f"Dataframe {self.df} is not a valid Dataframe."
@@ -34,10 +39,11 @@ class GluingTableModel(TableModel):
         self.df.index = pd.Index([i for i in range(len(self.df))])
         return return_val
         
-    
     def setValueAt(self, value, row, col, df=None):
-        print(row, col, value)
-        messagebox.showinfo(title="Achtung", message="Achtung")
+
+
+        GluingTableConversion.parse_edge_identification(row,col,value)
+        # messagebox.showinfo(title="Achtung", message="Achtung")
 
         return super().setValueAt(value, row, col, df)
     
@@ -56,6 +62,8 @@ class GluingTableInterface:
         assert isinstance(root, tk.Tk), f"Root {root} is not a valid tk.Tk object."
         self.root = root
         self.window = GUIWindow(root, "Construct Triangulation Gluing Table")
+        self.triangulation = TopologicalMultiTriangle()
+
         
 
         self.buttons_frame = ttk.Frame(self.window.tk_window)
@@ -79,7 +87,7 @@ class GluingTableInterface:
 
         self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
         self.gluing_table.showIndex()
-        self.gluing_table.model = GluingTableModel(dataframe=self.initial_table)
+        self.gluing_table.model = GluingTableModel(self.triangulation,dataframe=self.initial_table)
         self.gluing_table.multiplerowlist = [0]
         self.gluing_table.redraw()
         self.add_triangle_button.bind("<ButtonPress>", lambda event : [self.gluing_table.model.addRow(), self.gluing_table.redraw()])
