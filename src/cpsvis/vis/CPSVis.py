@@ -27,14 +27,18 @@ class GluingTableModel(TableModel):
         return super().getValueAt(row, col)
     
     def addRow(self):
-        self.df.index = pd.Index([i for i in range(len(self.df))])
         self.df.loc[len(self.df.index)] = [""]*len(self.df.columns)
 
     def deleteRow(self, row, unique=True):
-        return super().deleteRow(row, unique)
+        return_val = super().deleteRow(row, unique)
+        self.df.index = pd.Index([i for i in range(len(self.df))])
+        return return_val
+        
     
     def setValueAt(self, value, row, col, df=None):
         print(row, col, value)
+        messagebox.showinfo(title="Achtung", message="Achtung")
+
         return super().setValueAt(value, row, col, df)
     
 
@@ -74,6 +78,7 @@ class GluingTableInterface:
 
 
         self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
+        self.gluing_table.showIndex()
         self.gluing_table.model = GluingTableModel(dataframe=self.initial_table)
         self.gluing_table.multiplerowlist = [0]
         self.gluing_table.redraw()
