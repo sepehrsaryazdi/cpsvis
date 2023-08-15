@@ -42,6 +42,9 @@ class GluingTableModel(TableModel):
 
     def deleteRow(self, row, unique=True):
         return_val = super().deleteRow(row, unique)
+        self.triangulation.delete_polygon(self.triangulation.index_to_polygon_hash[str(row)])
+
+
         self.df.index = pd.Index([i for i in range(len(self.df))])
         return return_val
         

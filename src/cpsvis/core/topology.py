@@ -68,6 +68,20 @@ class TopologicalEdgeGluing:
         return self.edge_glued_first_vertex
     def get_glued_second_vertex(self):
         return self.edge_glued_second_vertex
+    
+    def unglue_edge(self):
+        """
+        Unglues this edge to any other edge.
+        """
+        if self.edge_glued != None:
+            assert isinstance(self.edge_glued.edge_glued, TopologicalEdgeGluing), f"Glued edge {self.edge_glued.edge_glued} is not a valid TopologicalEdgeGluing."
+            self.edge_glued.edge_glued.edge_glued = None
+            self.edge_glued.edge_glued.edge_glued_first_vertex = None
+            self.edge_glued.edge_glued.edge_glued_second_vertex = None
+        
+        self.edge_glued = None
+        self.edge_glued_first_vertex = None
+        self.edge_glued_second_vertex = None
 
 class TopologicalVertex:
     def __init__(self):
@@ -100,6 +114,9 @@ class TopologicalEdge:
         self.neighbouring_edges = {v0: [], v1: []} # Hash map for all neighbouring edges connected at v0 or v1
         self.edge_glued = TopologicalEdgeGluing(self)
     
+    def unglue_edge(self):
+        self.edge_glued.unglue_edge()
+
     def get_other_vertex(self, vertex) -> None:
         assert isinstance(vertex, TopologicalVertex), f"Vertex {vertex} is not a valid TopologicalVertex."
         assert vertex in self.vertices, f"Vertex {vertex} is not a child vertex of edge {self}."
@@ -148,6 +165,14 @@ class TopologicalPolygon:
         self.index_to_vertex_hash = {} # Takes keys as index string and returns the corresponding vertex.
         self.edge_to_index_hash = {} # Takes keys as edge and returns the corresopnding index.
         self.vertex_to_index_hash = {} # Takes keys as vertex and returns the corresponding index.
+
+    def disconnect_gluings(self):
+        """
+        Disconnects all gluings of edges of this triangle from all other triangles.
+        """
+        for edge in self.edges:
+            assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
+            edge.unglue_edge()
 
     def edge_index_increasing_hash(self) -> dict:
         """
@@ -318,6 +343,19 @@ class TopologicalMultiPolygon:
             self.index_to_polygon_hash[str(index)] = polygon
             polygon.auto_index_children()
             index+=1
+    
+    def delete_polygon(self, polygon):
+        """
+        Deletes a polygon by looking at all its edges, vertices and ungluing to any other triangles. 
+        """
+        assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
+        if polygon in self.polygon_to_index_hash.keys():
+            index = self.polygon_to_index_hash[polygon]
+            self.polygon_to_index_hash.pop(polygon)
+            self.index_to_polygon_hash.pop(index)
+        
+        self.polygons.remove(polygon)
+        polygon.disconnect_gluings()
         
 
 class TopologicalMultiTriangle(TopologicalMultiPolygon):
