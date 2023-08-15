@@ -33,6 +33,10 @@ class GluingTableModel(TableModel):
     def deleteRow(self, row, unique=True):
         return super().deleteRow(row, unique)
     
+    def setValueAt(self, value, row, col, df=None):
+        print(row, col, value)
+        return super().setValueAt(value, row, col, df)
+    
 
 
 class TkApp(tk.Frame):

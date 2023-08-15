@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="cpsvis",
-    version="0.0.22",
+    version="0.1.0",
     description="Convex Projective Surface Visualisation Tool",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
