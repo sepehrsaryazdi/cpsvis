@@ -42,7 +42,7 @@ class GluingTableModel(TableModel):
     def setValueAt(self, value, row, col, df=None):
 
         try:
-            succeeded, parsing = GluingTableConversion.parse_edge_identification(row,col,value)
+            succeeded, parsing = GluingTableConversion.parse_edge_identification(row,col,value, self.df)
             
             
             

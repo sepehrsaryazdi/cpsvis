@@ -14,7 +14,7 @@ class GluingTableConversion:
         assert isinstance(gluing_table, pd.DataFrame)
         pass
 
-    def parse_edge_identification(row,col,value) -> tuple[bool, dict]:
+    def parse_edge_identification(row,col,value, dataframe) -> tuple[bool, dict]:
         """
         Parses edge identification
         
@@ -22,15 +22,19 @@ class GluingTableConversion:
         assert isinstance(row, int), f"Row {row} is not a valid int."
         assert isinstance(col, int), f"Col {col} is not a valid int."
         assert isinstance(value, str), f"Value {value} is not a valid string."
+        assert isinstance(dataframe, pd.DataFrame), f"Dataframe {dataframe} is not a valid Pandas dataframe."
 
     
         triangle_index, edge_bracket = value.rsplit(" ")
         triangle_index = int(triangle_index)
         
         assert edge_bracket.count("(") == 1 and edge_bracket.count(")") == 1, f"One or more brackets are misplaced."
-        edge_bracket = edge_bracket.rsplit("(")[1].rsplit(")")[0]
-        print(edge_bracket)
+        second_edge_index = edge_bracket.rsplit("(")[1].rsplit(")")[0]
+
+        print(triangle_index, second_edge_index)
         
+        column_name = dataframe.columns[col]
+        first_edge_index = column_name.rsplit("(")[1].rsplit(")")[0]
         
         return (True, {})
 

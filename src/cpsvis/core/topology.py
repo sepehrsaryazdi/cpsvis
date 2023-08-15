@@ -149,6 +149,23 @@ class TopologicalPolygon:
         self.edge_to_index_hash = {} # Takes keys as edge and returns the corresopnding index.
         self.vertex_to_index_hash = {} # Takes keys as vertex and returns the corresponding index.
 
+    def edge_index_increasing_hash(self) -> dict:
+        """
+        Returns a dictionary of edges with keys in increasing order and value the actual edge order.
+        """
+        hash_map = self.index_to_edge_hash
+        keys = hash_map.keys()
+
+        increasing_hash = {}
+        for key in keys:
+            assert isinstance(key, str), f"Edge index {key} is not a valid str."
+            vertex_indices = [int(i) for i in key]
+            vertex_indices.sort()
+            vertex_indices = [str(i) for i in vertex_indices]
+            increasing_hash["".join(vertex_indices)] = key
+        return increasing_hash
+        
+
     def check_closed(self) -> tuple[bool, list, list]:
         """
         Traverses the polygon by starting at some random vertex (the first edge's first vertex) until it has made #edges steps. 
