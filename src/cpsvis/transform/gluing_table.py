@@ -38,4 +38,12 @@ class GluingTableConversion:
         
         return (first_triangle_index, first_edge_index, second_triangle_index, second_edge_index)
 
+    def update_triangulation_gluing(first_triangle_index, first_edge_index, second_triangle_index, second_edge_index, triangulation):
+        assert isinstance(first_edge_index, int), f"First triangle index {first_triangle_index} is not a valid int."
+        assert isinstance(first_edge_index, str), f"First edge index {first_edge_index} is not a valid int."
+        assert isinstance(second_triangle_index, int), f"Second triangle index {second_edge_index} is not a valid int."
+        assert isinstance(second_edge_index, str), f"Second edge index {second_edge_index} is not a valid str."
+        assert isinstance(triangulation, TopologicalMultiTriangle), f"Triangulation {triangulation} is not a valid TopologicalMultiTriangle."
+
+        
         
