@@ -45,6 +45,6 @@ class GluingTableConversion:
         assert isinstance(second_edge_index, str), f"Second edge index {second_edge_index} is not a valid str."
         assert isinstance(triangulation, TopologicalMultiTriangle), f"Triangulation {triangulation} is not a valid TopologicalMultiTriangle."
 
-        print(triangulation)
+        print(triangulation.index_to_polygon_hash)
 
         

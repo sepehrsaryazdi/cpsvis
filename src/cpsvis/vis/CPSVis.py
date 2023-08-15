@@ -34,6 +34,12 @@ class GluingTableModel(TableModel):
     def addRow(self):
         self.df.loc[len(self.df.index)] = [""]*len(self.df.columns)
 
+        triangle = TopologicalTriangle()
+        triangle.auto_add_three_edges()
+
+        self.triangulation.add_disjoint_polygon(triangle)
+        self.triangulation.auto_index_children()
+
     def deleteRow(self, row, unique=True):
         return_val = super().deleteRow(row, unique)
         self.df.index = pd.Index([i for i in range(len(self.df))])
@@ -98,7 +104,7 @@ class GluingTableInterface:
 
         triangle = TopologicalTriangle()
         triangle.auto_add_three_edges()
-        
+
         self.triangulation.add_disjoint_polygon(triangle)
         self.triangulation.auto_index_children()
         self.gluing_table.model = GluingTableModel(self.triangulation,dataframe=self.initial_table)
