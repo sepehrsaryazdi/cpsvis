@@ -42,12 +42,12 @@ class GluingTableModel(TableModel):
     def setValueAt(self, value, row, col, df=None):
 
         try:
-            succeeded, parsing = GluingTableConversion.parse_edge_identification(row,col,value, self.df)
+            first_triangle_index, first_edge_index, second_triangle_index, second_edge_index = GluingTableConversion.parse_edge_identification(row,col,value, self.df)
+            print(first_triangle_index, first_edge_index, second_triangle_index, second_edge_index)
             
+        
             
-            
-            
-            return super().setValueAt(value, row, col, df)
+            return super().setValueAt(f"{second_triangle_index} ({second_edge_index})", row, col, df)
         except Exception as e:
             e = str(e)
             messagebox.showinfo(title="Error", message=e.capitalize())

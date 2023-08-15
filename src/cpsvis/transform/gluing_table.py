@@ -14,7 +14,7 @@ class GluingTableConversion:
         assert isinstance(gluing_table, pd.DataFrame)
         pass
 
-    def parse_edge_identification(row,col,value, dataframe) -> tuple[bool, dict]:
+    def parse_edge_identification(row,col,value, dataframe) -> tuple[int, str, int, str]:
         """
         Parses edge identification
         
@@ -26,16 +26,16 @@ class GluingTableConversion:
 
     
         triangle_index, edge_bracket = value.rsplit(" ")
-        triangle_index = int(triangle_index)
+        second_triangle_index = int(triangle_index)
         
         assert edge_bracket.count("(") == 1 and edge_bracket.count(")") == 1, f"One or more brackets are misplaced."
         second_edge_index = edge_bracket.rsplit("(")[1].rsplit(")")[0]
 
-        print(triangle_index, second_edge_index)
         
         column_name = dataframe.columns[col]
         first_edge_index = column_name.rsplit("(")[1].rsplit(")")[0]
+        first_triangle_index = dataframe.index[row]
         
-        return (True, {})
+        return (first_triangle_index, first_edge_index, second_triangle_index, second_edge_index)
 
         
