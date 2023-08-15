@@ -41,11 +41,18 @@ class GluingTableModel(TableModel):
         
     def setValueAt(self, value, row, col, df=None):
 
+        try:
+            succeeded, parsing = GluingTableConversion.parse_edge_identification(row,col,value)
+            
+            
+            
+            
+            return super().setValueAt(value, row, col, df)
+        except Exception as e:
+            e = str(e)
+            messagebox.showinfo(title="Error", message=e.capitalize())
+        
 
-        GluingTableConversion.parse_edge_identification(row,col,value)
-        # messagebox.showinfo(title="Achtung", message="Achtung")
-
-        return super().setValueAt(value, row, col, df)
     
 
 

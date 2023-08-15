@@ -5,6 +5,8 @@ This module allows conversion between the gluing table representation and a Topo
 
 from cpsvis.core.topology import TopologicalMultiTriangle
 import pandas as pd
+from tkinter import ttk, messagebox
+
 
 class GluingTableConversion:
 
@@ -12,7 +14,7 @@ class GluingTableConversion:
         assert isinstance(gluing_table, pd.DataFrame)
         pass
 
-    def parse_edge_identification(row,col,value):
+    def parse_edge_identification(row,col,value) -> tuple[bool, dict]:
         """
         Parses edge identification
         
@@ -21,9 +23,15 @@ class GluingTableConversion:
         assert isinstance(col, int), f"Col {col} is not a valid int."
         assert isinstance(value, str), f"Value {value} is not a valid string."
 
-        try:
-            print(row,col,value)
-            print(value.rsplit(" "))
-        except Exception as e:
-            print(e)
+    
+        triangle_index, edge_bracket = value.rsplit(" ")
+        triangle_index = int(triangle_index)
+        
+        assert edge_bracket.count("(") == 1 and edge_bracket.count(")") == 1, f"One or more brackets are misplaced."
+        edge_bracket = edge_bracket.rsplit("(")[1].rsplit(")")[0]
+        print(edge_bracket)
+        
+        
+        return (True, {})
+
         
