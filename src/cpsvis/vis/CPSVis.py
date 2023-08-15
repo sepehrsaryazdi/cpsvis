@@ -60,7 +60,11 @@ class GluingTableModel(TableModel):
             return super().setValueAt(f"{second_triangle_index} ({second_edge_index})", row, col, df)
         except Exception as e:
             e = str(e)
-            messagebox.showinfo(title="Error", message=e.capitalize())
+            if len(e) >= 1:
+                e = e[0].capitalize() + e[1:]
+            else:
+                e = e[0].capitalize()
+            messagebox.showinfo(title="Error", message=e)
         
 
     
