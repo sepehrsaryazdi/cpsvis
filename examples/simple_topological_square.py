@@ -25,5 +25,12 @@ polygon.auto_index_children()
 print(polygon.index_to_vertex_hash)
 print(polygon.edge_index_increasing_hash())
 
+polygon.auto_index_children()
+
+
+print(polygon.index_to_vertex_hash)
+print(polygon.edge_index_increasing_hash())
+
+
 # print(polygon.check_closed())
 

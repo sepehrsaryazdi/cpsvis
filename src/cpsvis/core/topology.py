@@ -288,7 +288,17 @@ class TopologicalTriangle(TopologicalPolygon):
         assert len(self.edges) <= 2, f"Triangle {self} cannot have more than 3 edges."
         return super().add_vertex_connected_edge(connecting_edge, new_edge, common_vertex)
 
-    
+    def auto_add_three_edges(self):
+        v0 = TopologicalVertex()
+        v1 = TopologicalVertex()
+        v2 = TopologicalVertex()
+        e1 = TopologicalEdge(v0,v1)
+        e2 = TopologicalEdge(v1, v2)
+        e3 = TopologicalEdge(v2, v0)
+        self.add_disjoint_edge(e1)
+        self.add_vertex_connected_edge(e1, e2, v1)
+        self.add_vertex_connected_edge(e2, e3, v2)
+        e3.add_neighbouring_edge(e1, v0)
 
 class TopologicalMultiPolygon:
     def __init__(self):
@@ -299,6 +309,16 @@ class TopologicalMultiPolygon:
     def add_disjoint_polygon(self, polygon) -> None:
         assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
         self.polygons.append(polygon)
+    
+    def auto_index_children(self):
+        index = 0
+        for polygon in self.polygons:
+            assert isinstance(polygon, TopologicalPolygon), f"Polygon {polygon} is not a valid TopologicalPolygon."
+            self.polygon_to_index_hash[polygon] = str(index)
+            self.index_to_polygon_hash[str(index)] = polygon
+            polygon.auto_index_children()
+            index+=1
+        
 
 class TopologicalMultiTriangle(TopologicalMultiPolygon):
     def __init__(self):

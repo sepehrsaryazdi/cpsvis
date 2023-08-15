@@ -9,7 +9,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkthemes import ThemedTk
-from cpsvis.core.topology import TopologicalMultiTriangle, TopologicalPolygon
+from cpsvis.core.topology import TopologicalMultiTriangle, TopologicalTriangle
 from cpsvis.transform.gluing_table import GluingTableConversion
 import os
 
@@ -43,8 +43,9 @@ class GluingTableModel(TableModel):
 
         try:
             first_triangle_index, first_edge_index, second_triangle_index, second_edge_index = GluingTableConversion.parse_edge_identification(row,col,value, self.df)
-            print(first_triangle_index, first_edge_index, second_triangle_index, second_edge_index)
+            # print(first_triangle_index, first_edge_index, second_triangle_index, second_edge_index)
             
+            GluingTableConversion.update_triangulation_gluing(first_triangle_index, first_edge_index, second_triangle_index, second_edge_index, self.triangulation)
         
             
             return super().setValueAt(f"{second_triangle_index} ({second_edge_index})", row, col, df)
@@ -94,6 +95,12 @@ class GluingTableInterface:
 
         self.gluing_table = Table(self.table_frame, enable_menus=False, dataframe=self.initial_table)
         self.gluing_table.showIndex()
+
+        triangle = TopologicalTriangle()
+        triangle.auto_add_three_edges()
+        
+        self.triangulation.add_disjoint_polygon(triangle)
+        self.triangulation.auto_index_children()
         self.gluing_table.model = GluingTableModel(self.triangulation,dataframe=self.initial_table)
         self.gluing_table.multiplerowlist = [0]
         self.gluing_table.redraw()
