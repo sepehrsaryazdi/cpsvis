@@ -49,7 +49,7 @@ class GluingTableConversion:
 
         first_triangle = triangulation.index_to_polygon_hash[first_triangle_index]
 
-        assert second_edge_index in triangulation.index_to_polygon_hash.keys(), f"Triangle index {second_triangle_index} is not a valid index."
+        assert (second_triangle_index in triangulation.index_to_polygon_hash.keys()), f"Triangle index {second_triangle_index} is not a valid index."
 
         second_triangle = triangulation.index_to_polygon_hash[second_triangle_index]
         print(first_triangle, second_triangle)
