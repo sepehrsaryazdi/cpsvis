@@ -10,7 +10,7 @@ class TopologicalEdgeGluing:
         self.edge_glued_first_vertex = None
         self.edge_glued_second_vertex = None
     
-    def glue_edge(self, edge_to_glue, first_vertex, second_vertex):
+    def glue_edge(self, edge_to_glue, self_edge_first_vertex, self_edge_second_vertex ,edge_to_glue_first_vertex, edge_to_glue_second_vertex):
         """
         Glues this edge to edge_to_glue with orientation defined as this edge's first vertex being glued to the first_vertex of the edge_to_glue, and the second vertex being glued to second_vertex.
         This function will also update the other edge's knowledge of which edge it is glued to, that is, it will be glued to this edge.
@@ -23,7 +23,7 @@ class TopologicalEdgeGluing:
         v22 = TopologicalVertex()
         edge2 = TopologicalEdge(v21, v22)
 
-        edge1.edge_glued.glue_edge(edge2, v21, v22)
+        edge1.edge_glued.glue_edge(edge2, v11,v12, v21, v22)
 
         This corresponds to edge1 and edge2 being identified with the same orientation.
 
@@ -36,34 +36,43 @@ class TopologicalEdgeGluing:
         v22 = TopologicalVertex()
         edge2 = TopologicalEdge(v21, v22)
 
-        edge1.edge_glued.glue_edge(edge2, v22, v21)
+        edge1.edge_glued.glue_edge(edge2, v11, v12, v22, v21)
 
         This corresponds to edge1 and edge2 being identified with opposite orientations.
         """
         assert isinstance(edge_to_glue, TopologicalEdge), f"Edge {edge_to_glue} is not a valid TopologicalEdge."
-        assert isinstance(first_vertex, TopologicalVertex), f"Vertex {first_vertex} is not a valid TopologicalVertex."
-        assert isinstance(second_vertex, TopologicalVertex), f"Vertex {second_vertex} is not a valid TopologicalVertex."
+        assert isinstance(edge_to_glue_first_vertex, TopologicalVertex), f"Vertex {edge_to_glue_first_vertex} is not a valid TopologicalVertex."
+        assert isinstance(edge_to_glue_second_vertex, TopologicalVertex), f"Vertex {edge_to_glue_second_vertex} is not a valid TopologicalVertex."
 
-        assert first_vertex != second_vertex, f"Cannot glue {self.self_edge} to the same vertex of edge {edge_to_glue}."
-        assert edge_to_glue in first_vertex.parent_edges, f"Vertex {first_vertex} is not a child vertex of edge {edge_to_glue}."
-        assert edge_to_glue in second_vertex.parent_edges, f"Vertex {second_vertex} is not a child vertex of edge {edge_to_glue}."
+        assert edge_to_glue_first_vertex != edge_to_glue_second_vertex, f"Cannot glue {self.self_edge} to the same vertex of edge {edge_to_glue}."
+        assert edge_to_glue in edge_to_glue_first_vertex.parent_edges, f"Vertex {edge_to_glue_first_vertex} is not a child vertex of edge {edge_to_glue}."
+        assert edge_to_glue in edge_to_glue_second_vertex.parent_edges, f"Vertex {edge_to_glue_second_vertex} is not a child vertex of edge {edge_to_glue}."
 
+        self.self_edge_first_vertex = self_edge_first_vertex
+        self.self_edge_second_vertex = self_edge_second_vertex
         self.edge_glued = edge_to_glue
-        self.edge_glued_first_vertex = first_vertex
-        self.edge_glued_second_vertex = second_vertex
+        self.edge_glued_first_vertex = edge_to_glue_first_vertex
+        self.edge_glued_second_vertex = edge_to_glue_second_vertex
 
-        flipped = (first_vertex != edge_to_glue.v0) # If the orientation is flipped in the gluing, this needs to be reflected in the other gluing
-        if not flipped:
-            if not (edge_to_glue.edge_glued.edge_glued == self.self_edge and edge_to_glue.edge_glued.edge_glued_first_vertex == self.self_edge.v0 and edge_to_glue.edge_glued.edge_glued_second_vertex == self.self_edge.v1):
-                # Only perform this operation if the gluing actually changes the current topological configuration.
-                edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v0, self.self_edge.v1)
-        else:
-            if not (edge_to_glue.edge_glued.edge_glued == self.self_edge and edge_to_glue.edge_glued.edge_glued_first_vertex == self.self_edge.v1 and edge_to_glue.edge_glued.edge_glued_second_vertex == self.self_edge.v0):
-                # Only perform this operation if the gluing actually changes the current topological configuration.
-                edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v1, self.self_edge.v0)
+        if not (edge_to_glue.edge_glued.edge_glued == self.self_edge and edge_to_glue.edge_glued.edge_glued_first_vertex == self.self_edge_first_vertex and edge_to_glue.edge_glued.edge_glued_second_vertex == self.self_edge_second_vertex):
+            edge_to_glue.edge_glued.glue_edge(self.self_edge, self.edge_glued_first_vertex, self.edge_glued_second_vertex, self.self_edge_first_vertex, self.self_edge_second_vertex)
+
+        # flipped = (edge_to_glue_first_vertex != edge_to_glue.v0) # If the orientation is flipped in the gluing, this needs to be reflected in the other gluing
+        # if not flipped:
+        #     if not (edge_to_glue.edge_glued.edge_glued == self.self_edge and edge_to_glue.edge_glued.edge_glued_first_vertex == self.self_edge.v0 and edge_to_glue.edge_glued.edge_glued_second_vertex == self.self_edge.v1):
+        #         # Only perform this operation if the gluing actually changes the current topological configuration.
+        #         edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v0, self.self_edge.v1)
+        # else:
+        #     if not (edge_to_glue.edge_glued.edge_glued == self.self_edge and edge_to_glue.edge_glued.edge_glued_first_vertex == self.self_edge.v1 and edge_to_glue.edge_glued.edge_glued_second_vertex == self.self_edge.v0):
+        #         # Only perform this operation if the gluing actually changes the current topological configuration.
+        #         edge_to_glue.edge_glued.glue_edge(self.self_edge, self.self_edge.v1, self.self_edge.v0)
     
     def get_edge(self):
         return self.edge_glued
+    def get_self_first_vertex(self):
+        return self.self_edge_first_vertex
+    def get_self_second_vertex(self):
+        return self.self_edge_second_vertex
     def get_glued_first_vertex(self):
         return self.edge_glued_first_vertex
     def get_glued_second_vertex(self):
@@ -75,10 +84,14 @@ class TopologicalEdgeGluing:
         """
         if self.edge_glued != None:
             assert isinstance(self.edge_glued.edge_glued, TopologicalEdgeGluing), f"Glued edge {self.edge_glued.edge_glued} is not a valid TopologicalEdgeGluing."
+            self.self_edge_first_vertex = None
+            self.self_edge_second_vertex = None
             self.edge_glued.edge_glued.edge_glued = None
             self.edge_glued.edge_glued.edge_glued_first_vertex = None
             self.edge_glued.edge_glued.edge_glued_second_vertex = None
         
+        self.self_edge_first_vertex = None
+        self.self_edge_first_vertex = None
         self.edge_glued = None
         self.edge_glued_first_vertex = None
         self.edge_glued_second_vertex = None
