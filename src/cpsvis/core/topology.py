@@ -40,11 +40,18 @@ class TopologicalEdgeGluing:
 
         This corresponds to edge1 and edge2 being identified with opposite orientations.
         """
+        assert isinstance(self_edge_first_vertex, TopologicalVertex), f"Vertex {self_edge_first_vertex} is not a valid TopologicalVertex."
+        assert isinstance(self_edge_second_vertex, TopologicalVertex), f"Vertex {self_edge_second_vertex} is not a valid TopologicalVertex."
         assert isinstance(edge_to_glue, TopologicalEdge), f"Edge {edge_to_glue} is not a valid TopologicalEdge."
         assert isinstance(edge_to_glue_first_vertex, TopologicalVertex), f"Vertex {edge_to_glue_first_vertex} is not a valid TopologicalVertex."
         assert isinstance(edge_to_glue_second_vertex, TopologicalVertex), f"Vertex {edge_to_glue_second_vertex} is not a valid TopologicalVertex."
 
+
+        assert self_edge_first_vertex != self_edge_second_vertex, f"Cannot glue {edge_to_glue} to the same vertex of edge {self.self_edge}"
         assert edge_to_glue_first_vertex != edge_to_glue_second_vertex, f"Cannot glue {self.self_edge} to the same vertex of edge {edge_to_glue}."
+        
+        assert self.self_edge in self_edge_first_vertex.parent_edges, f"Vertex {self_edge_first_vertex} is not a child vertex of edge {self.self_edge}."
+        assert self.self_edge in self_edge_second_vertex.parent_edges, f"Vertex {self_edge_second_vertex} is not a child vertex of edge {self.self_edge}."
         assert edge_to_glue in edge_to_glue_first_vertex.parent_edges, f"Vertex {edge_to_glue_first_vertex} is not a child vertex of edge {edge_to_glue}."
         assert edge_to_glue in edge_to_glue_second_vertex.parent_edges, f"Vertex {edge_to_glue_second_vertex} is not a child vertex of edge {edge_to_glue}."
 
