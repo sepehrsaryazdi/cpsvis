@@ -4,6 +4,7 @@ This module allows conversion between the gluing table representation and a Topo
 """
 
 from cpsvis.core.topology import TopologicalMultiTriangle, TopologicalTriangle, TopologicalEdge, TopologicalVertex
+from cpsvis.vis.combinatorial_map import CombinatorialAlgorithm
 import pandas as pd
 import numpy as np
 from tkinter import ttk, messagebox
@@ -130,7 +131,7 @@ class GluingTableConversion:
         first_edge.edge_glued.glue_edge(second_edge, first_edge_vertices[0], first_edge_vertices[1], second_edge_vertices[0], second_edge_vertices[1])
         
         
-        
+        print(CombinatorialAlgorithm.spanning_polygon_tree(triangulation.polygons[0], [], []))
         # print(first_triangle, first_edge, second_triangle, second_edge)
 
         # GluingTableConversion.edge_gluing_flipped(first_edge_index, second_edge_index)
