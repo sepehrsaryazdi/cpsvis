@@ -27,5 +27,15 @@ class CombinatorialAlgorithm:
     
     def spanning_polygon_forest(multi_polygon):
         assert isinstance(multi_polygon, TopologicalMultiPolygon), f"Multi polygon {multi_polygon} is not a valid TopologicalMultiPolygon."
-
-
+        spanning_forest = []
+        remaining_polygons = multi_polygon.polygons.copy()
+        while len(remaining_polygons) > 0:
+            polygon = remaining_polygons[0]
+            discovered_polygons, edge_connections = CombinatorialAlgorithm.spanning_polygon_tree(polygon, [], [])
+            spanning_forest.append({"polygons": discovered_polygons, "edge_connections": edge_connections})
+            new_remaining_polygons = []
+            for polygon in remaining_polygons:
+                if polygon not in discovered_polygons:
+                    new_remaining_polygons.append(polygon)
+            remaining_polygons = new_remaining_polygons
+        return spanning_forest
