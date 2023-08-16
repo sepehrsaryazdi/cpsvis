@@ -46,22 +46,36 @@ class GluingTableConversion:
         indices = [str(i) for i in indices]
         return "".join(indices)
     
-    def convert_vertices_anticlockwise_order(edge_vertices, edge_index) -> tuple[TopologicalVertex, TopologicalVertex]:
-        """
-        Sorts the edge's vertices in the same way as the sorting of the edge index.
-        """
+    # def convert_vertices_anticlockwise_order(edge_vertices, edge_index) -> tuple[TopologicalVertex, TopologicalVertex]:
+    #     """
+    #     Sorts the edge's vertices in the same way as the sorting of the edge index.
+    #     """
         
-        assert isinstance(edge_index, str), f"Edge index {edge_index} is not a valid str."
-        indices = np.array([int(i) for i in edge_index])
+    #     assert isinstance(edge_index, str), f"Edge index {edge_index} is not a valid str."
+    #     indices = np.array([int(i) for i in edge_index])
         
-        sorting_indices = np.argsort(indices)
-        indices.sort()
-        indices = [str(i) for i in indices]
-        sorted_edges = np.array(edge_vertices)[sorting_indices]
-        if "".join(indices) == "02":
-            return (sorted_edges[1], sorted_edges[0])
-        else:
-            return (sorted_edges[0], sorted_edges[1])
+    #     sorting_indices = np.argsort(indices)
+    #     indices.sort()
+    #     indices = [str(i) for i in indices]
+    #     sorted_edges = np.array(edge_vertices)[sorting_indices]
+    #     if "".join(indices) == "02":
+    #         return (sorted_edges[1], sorted_edges[0])
+    #     else:
+    #         return (sorted_edges[0], sorted_edges[1])
+
+    def get_vertices_in_index_order(triangle, edge, desired_index) -> tuple[TopologicalVertex, TopologicalVertex]:
+        assert isinstance(triangle, TopologicalTriangle), f"Triangle {triangle} is not a valid TopologicalTriangle."
+        assert isinstance(edge, TopologicalEdge), f"Edge {edge} is not a valid TopologicalEdge."
+        assert isinstance(desired_index, str), f"Desired index {desired_index} is not a valid str."
+
+        indices = [i for i in desired_index]
+        vertices = edge.vertices
+        vertices_desired_order = [triangle.index_to_vertex_hash[index] for index in indices]
+        
+        for v in vertices_desired_order:
+            assert v in vertices, f"Vertex {v} is not a child vertex of edge {edge}."
+
+        return vertices_desired_order
 
     
     def edge_gluing_flipped(first_edge_index, second_edge_index):
@@ -105,13 +119,25 @@ class GluingTableConversion:
         second_edge = second_triangle.index_to_edge_hash[second_triangle_increasing_hash[second_edge_index_increasing]]
         assert isinstance(second_edge, TopologicalEdge), f"Second edge {second_edge} is not a valid TopologicalEdge."
 
+
+        first_edge_vertices = GluingTableConversion.get_vertices_in_index_order(first_triangle, first_edge, first_edge_index)
+        second_edge_vertices = GluingTableConversion.get_vertices_in_index_order(second_triangle, second_edge, second_edge_index)
+
+        # print([first_triangle.vertex_to_index_hash[v] for v in first_edge_vertices])
+
+        # print([second_triangle.vertex_to_index_hash[v] for v in second_edge_vertices])
+
+        first_edge.edge_glued.glue_edge(second_edge, first_edge_vertices[0], first_edge_vertices[1], second_edge_vertices[0], second_edge_vertices[1])
+        
+        
+        
         # print(first_triangle, first_edge, second_triangle, second_edge)
 
-        GluingTableConversion.edge_gluing_flipped(first_edge_index, second_edge_index)
-        first_edge_sorted_vertices = GluingTableConversion.convert_vertices_anticlockwise_order((first_edge.v0, first_edge.v1), first_edge_index)
-        second_edge_sorted_vertices =  GluingTableConversion.convert_vertices_anticlockwise_order((second_edge.v0, second_edge.v1), second_edge_index)
+        # GluingTableConversion.edge_gluing_flipped(first_edge_index, second_edge_index)
+        # first_edge_sorted_vertices = GluingTableConversion.convert_vertices_anticlockwise_order((first_edge.v0, first_edge.v1), first_edge_index)
+        # second_edge_sorted_vertices =  GluingTableConversion.convert_vertices_anticlockwise_order((second_edge.v0, second_edge.v1), second_edge_index)
 
         # print(first_edge_index,first_edge_sorted_vertices == (first_edge.v0, first_edge.v1))
 
 
-        first_edge.edge_glued.glue_edge(second_edge, first_edge_sorted_vertices[0], first_edge_sorted_vertices[1], second_edge_sorted_vertices[0], second_edge_sorted_vertices[1])
+        # first_edge.edge_glued.glue_edge(second_edge, first_edge_sorted_vertices[0], first_edge_sorted_vertices[1], second_edge_sorted_vertices[0], second_edge_sorted_vertices[1])
